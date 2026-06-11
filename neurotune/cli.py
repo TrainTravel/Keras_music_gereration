@@ -42,6 +42,15 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--list-moods", action="store_true",
                         help="describe available mood presets and exit")
 
+    session = parser.add_argument_group("session mode (Pomodoro cowork video)")
+    session.add_argument("--session", default=None,
+                         help="render a WxBxN Pomodoro video, e.g. 25x5x4 "
+                              "(25 min work + 5 min break, 4 rounds)")
+    session.add_argument("--work-mood", default="steady_focus",
+                         choices=sorted(PRESETS), help="mood during work segments")
+    session.add_argument("--break-mood", default="deep_calm",
+                         choices=sorted(PRESETS), help="mood during break segments")
+
     batch = parser.add_argument_group("batch mode (render a moods x seeds matrix)")
     batch.add_argument("--batch", action="store_true",
                        help="render many tracks at once into --outdir")
@@ -62,6 +71,18 @@ def main(argv=None) -> int:
     if args.list_moods:
         for preset in PRESETS.values():
             print(f"{preset.name:14s} {preset.tempo_bpm:3d} BPM  {preset.description}")
+        return 0
+
+    if args.session:
+        from . import session
+        corpus = sorted(glob.glob(os.path.join(args.corpus, "*.mid")))
+        out_path = args.out or f"session_{args.session}.mp4"
+        session.render_session(
+            args.session, out_path, work_mood=args.work_mood,
+            break_mood=args.break_mood, seed=args.seed, corpus_paths=corpus,
+        )
+        print(f"wrote {out_path}: Pomodoro session {args.session} "
+              f"(work={args.work_mood}, break={args.break_mood})")
         return 0
 
     if args.batch:
