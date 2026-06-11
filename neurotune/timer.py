@@ -141,6 +141,7 @@ def render_timer_video(wav_path: str, preset: MoodPreset, out_path: str, *,
         "-i", wav_path,
         "-c:v", "libx264", "-tune", "stillimage", "-pix_fmt", "yuv420p",
         "-r", "24", "-c:a", "aac", "-b:a", "192k", "-shortest",
+        "-movflags", "+faststart",
         out_path,
     ]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE,

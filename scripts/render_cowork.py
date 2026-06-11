@@ -64,7 +64,8 @@ def main():
         session.BREAK_LABEL: video._PALETTES[BREAK],
     }
     timer.render_timer_video(WAV, PRESETS[WORK], OUT, fps=1,
-                             segments=segments, palettes=palettes)
+                             segments=segments, palettes=palettes,
+                             width=854, height=480)
     print(f"RENDER_DONE {OUT}", flush=True)
 
 
