@@ -27,9 +27,11 @@ python -m neurotune --mood steady_focus --minutes 60 --video focus.mp4
 ```
 
 Want to publish? See [docs/YOUTUBE.md](docs/YOUTUBE.md) for a channel-launch
-guide, and [docs/CHANNEL_PLAN.md](docs/CHANNEL_PLAN.md) for *Present* — a
+guide, [docs/CHANNEL_PLAN.md](docs/CHANNEL_PLAN.md) for *Present* — a
 body-doubling channel concept (cowork / meal-companion / build-with-me /
-get-ready-with-me) that uses NeuroTune for its background beds.
+get-ready-with-me) that uses NeuroTune for its background beds — and
+[docs/PRODUCTION_GUIDE.md](docs/PRODUCTION_GUIDE.md) for video-quality tips,
+fill-in script templates, and the build-with-Claude workflow.
 
 ## Moods
 
