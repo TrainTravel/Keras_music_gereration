@@ -23,6 +23,9 @@ def build_parser() -> argparse.ArgumentParser:
                         help="approximate length of the piece (default: 3)")
     parser.add_argument("--out", default=None,
                         help="output .mid path (default: <mood>.mid)")
+    parser.add_argument("--wav", default=None,
+                        help="also render a playable WAV to this path "
+                             "(offline synth, no soundfont needed)")
     parser.add_argument("--seed", type=int, default=None,
                         help="random seed for reproducible output")
     parser.add_argument("--tempo", type=int, default=None,
@@ -72,6 +75,11 @@ def main(argv=None) -> int:
     midi_io.render(events, preset, out_path)
     print(f"wrote {out_path}: mood={preset.name}, {preset.tempo_bpm} BPM, "
           f"~{args.minutes:g} min, {len(events)} melody notes")
+
+    if args.wav:
+        from . import audio
+        audio.synthesize(events, preset, args.wav, seed=args.seed)
+        print(f"wrote {args.wav}: playable WAV ({preset.name})")
     return 0
 
 

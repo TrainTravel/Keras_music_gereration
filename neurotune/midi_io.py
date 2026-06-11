@@ -36,7 +36,7 @@ def _events_to_track(events, channel: int, program: int) -> MidiTrack:
     return track
 
 
-def _drone_events(preset: MoodPreset, total_beats: float):
+def drone_events(preset: MoodPreset, total_beats: float):
     """Sustained root+fifth pad, one bar at a time — the steady 'brown-noise-like'
     texture from the survey, re-attacked gently each bar to avoid decay to silence."""
     root = parse_note(preset.root) - 12  # one octave below the melody register
@@ -51,7 +51,7 @@ def _drone_events(preset: MoodPreset, total_beats: float):
     return events
 
 
-def _percussion_events(preset: MoodPreset, total_beats: float):
+def percussion_events(preset: MoodPreset, total_beats: float):
     """Soft constant pulse: kick on beats 1 and 3, hats on every offbeat."""
     kick_vel = max(1, preset.velocity - 10)
     hat_vel = max(1, preset.velocity - 24)
@@ -79,10 +79,10 @@ def render(melody_events, preset: MoodPreset, out_path: str) -> MidiFile:
 
     midi.tracks.append(_events_to_track(melody_events, 0, preset.melody_program))
     if preset.drone:
-        midi.tracks.append(_events_to_track(_drone_events(preset, total_beats),
+        midi.tracks.append(_events_to_track(drone_events(preset, total_beats),
                                             1, preset.pad_program))
     if preset.percussion:
-        midi.tracks.append(_events_to_track(_percussion_events(preset, total_beats),
+        midi.tracks.append(_events_to_track(percussion_events(preset, total_beats),
                                             9, 0))
     midi.save(out_path)
     return midi

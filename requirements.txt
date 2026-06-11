@@ -1,5 +1,6 @@
-# Core (markov engine + rendering)
+# Core (markov engine + MIDI rendering + offline WAV synth)
 mido>=1.3
+numpy>=1.21
 
 # Development
 pytest>=7

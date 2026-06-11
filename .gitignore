@@ -102,3 +102,7 @@ ENV/
 
 
 .DS_store
+
+# Rendered audio previews — large, regenerate with `python -m neurotune ... --wav`
+Generated/*.wav
+*.wav

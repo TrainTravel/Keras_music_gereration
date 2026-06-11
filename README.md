@@ -15,9 +15,12 @@ optional `lstm` engine, modernized to tf.keras.
 ## Quick start
 
 ```bash
-pip install mido                 # the default engine needs nothing else
+pip install mido numpy           # the default engine + WAV synth need nothing else
 python -m neurotune --list-moods
 python -m neurotune --mood steady_focus --minutes 5 --seed 42 --out focus.mid
+
+# also render a playable WAV (offline synth, no soundfont required):
+python -m neurotune --mood deep_calm --minutes 10 --wav calm.wav
 ```
 
 ## Moods
