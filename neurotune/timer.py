@@ -2,15 +2,14 @@
 
 Digits 0-9 and ':' are rendered as a classic 7-segment display using array
 slicing, then composited onto a per-segment gradient background. Frames are
-written as a PPM sequence and muxed with the audio bed by the bundled ffmpeg.
+streamed straight into the bundled ffmpeg as raw video (no temp files, so
+hours-long renders are disk-cheap) and muxed with the audio bed.
 Visuals are kept gentle (soft contrast, no flashing) per the accessibility goals
 in docs/SURVEY.md and docs/CHANNEL_PLAN.md. Work/break state is conveyed by the
 background palette rather than small hard-to-read text.
 """
 
-import os
 import subprocess
-import tempfile
 
 import numpy as np
 
@@ -104,13 +103,6 @@ def _remaining_at(segments, t_sec):
     return 0, segments[-1][0]
 
 
-def _write_ppm(frame: np.ndarray, path: str):
-    h, w = frame.shape[:2]
-    with open(path, "wb") as fh:
-        fh.write(f"P6\n{w} {h}\n255\n".encode())
-        fh.write(frame.tobytes())
-
-
 def render_timer_video(wav_path: str, preset: MoodPreset, out_path: str, *,
                        fps: int = 10, count_from: int | None = None,
                        label: str | None = None, segments=None,
@@ -140,21 +132,34 @@ def render_timer_video(wav_path: str, preset: MoodPreset, out_path: str, *,
         return bg_cache[key]
 
     digit_h = height // 4
-    with tempfile.TemporaryDirectory() as tmp:
-        n_frames = max(1, int(round(duration * fps)))
+    # Stream raw frames straight into ffmpeg — no temp frame files, so hours-long
+    # renders need no extra disk space.
+    cmd = [
+        video._ffmpeg_exe(), "-y",
+        "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{width}x{height}",
+        "-framerate", str(fps), "-i", "-",
+        "-i", wav_path,
+        "-c:v", "libx264", "-tune", "stillimage", "-pix_fmt", "yuv420p",
+        "-r", "24", "-c:a", "aac", "-b:a", "192k", "-shortest",
+        out_path,
+    ]
+    proc = subprocess.Popen(cmd, stdin=subprocess.PIPE,
+                            stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+    n_frames = max(1, int(round(duration * fps)))
+    last_key, frame_bytes = None, None
+    try:
         for i in range(n_frames):
             remaining, seg_label = _remaining_at(segments, i / fps)
-            glyphs = render_seven_segment(_fmt_mmss(remaining), digit_h)
-            frame = _composite_centered(bg_for(seg_label), glyphs)
-            _write_ppm(frame, os.path.join(tmp, f"frame_{i:05d}.ppm"))
-
-        cmd = [
-            video._ffmpeg_exe(), "-y",
-            "-framerate", str(fps), "-i", os.path.join(tmp, "frame_%05d.ppm"),
-            "-i", wav_path,
-            "-c:v", "libx264", "-pix_fmt", "yuv420p", "-r", "24",
-            "-c:a", "aac", "-b:a", "192k", "-shortest",
-            out_path,
-        ]
-        subprocess.run(cmd, check=True, capture_output=True)
+            key = (remaining, seg_label)
+            if key != last_key:  # clock changes once per second; reuse otherwise
+                glyphs = render_seven_segment(_fmt_mmss(remaining), digit_h)
+                frame_bytes = _composite_centered(bg_for(seg_label),
+                                                  glyphs).tobytes()
+                last_key = key
+            proc.stdin.write(frame_bytes)
+    finally:
+        proc.stdin.close()
+        stderr = proc.stderr.read()
+        if proc.wait() != 0:
+            raise RuntimeError(f"ffmpeg failed: {stderr.decode(errors='replace')[-500:]}")
     return out_path

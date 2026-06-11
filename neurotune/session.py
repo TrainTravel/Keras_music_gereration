@@ -55,7 +55,7 @@ _CORPUS = None
 
 def render_session(spec: str, out_path: str, *, work_mood="steady_focus",
                    break_mood="deep_calm", seed: int | None = None,
-                   corpus_paths=None, sample_rate=None, fps=10,
+                   corpus_paths=None, sample_rate=None, fps=1,
                    width=1280, height=720) -> str:
     """Render a Pomodoro session video to out_path. Returns out_path."""
     global _CORPUS
