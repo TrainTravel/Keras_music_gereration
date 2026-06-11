@@ -39,8 +39,11 @@ velocity band.
 - [x] **M4 — CLI + example outputs**: `python -m neurotune --mood steady_focus --minutes 5`
 - [x] **M5 — Tests**: determinism, scale conformance, leap cap, MIDI round-trip
 - [x] **M6 — Optional LSTM engine + docs**: modernized Keras path, README rewrite
-- [ ] **M7 (future)**: audio rendering (soundfont), more corpus MIDI, adaptive
-      session lengths, user feedback loop for per-person preset tuning
+- [x] **M7 — Audio + video rendering**: offline WAV synth (`audio.py`), MP4 renderer
+      (`video.py`), publishing & channel docs
+- [ ] **M8–M13 — Content pipeline** (batch render, timer overlay, Pomodoro
+      sessions, metadata/thumbnails, content calendar, CI). Full executable
+      spec for a Claude Code session to take over: **`docs/BUILD_SPEC.md`**.
 
 ## Presets (from survey §4)
 
