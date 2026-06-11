@@ -21,7 +21,13 @@ python -m neurotune --mood steady_focus --minutes 5 --seed 42 --out focus.mid
 
 # also render a playable WAV (offline synth, no soundfont required):
 python -m neurotune --mood deep_calm --minutes 10 --wav calm.wav
+
+# render an uploadable MP4 (gradient + audio); needs `pip install imageio-ffmpeg`:
+python -m neurotune --mood steady_focus --minutes 60 --video focus.mp4
 ```
+
+Want to publish? See [docs/YOUTUBE.md](docs/YOUTUBE.md) for a channel-launch
+guide, including the corpus-licensing and health-claim caveats.
 
 ## Moods
 

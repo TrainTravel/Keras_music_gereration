@@ -7,3 +7,6 @@ pytest>=7
 
 # Optional: only needed for --engine lstm
 # tensorflow>=2.16
+
+# Optional: only needed for --video (MP4 rendering)
+# imageio-ffmpeg>=0.4

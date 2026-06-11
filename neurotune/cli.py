@@ -26,6 +26,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--wav", default=None,
                         help="also render a playable WAV to this path "
                              "(offline synth, no soundfont needed)")
+    parser.add_argument("--video", default=None,
+                        help="also render an uploadable MP4 (gradient + audio); "
+                             "requires imageio-ffmpeg")
     parser.add_argument("--seed", type=int, default=None,
                         help="random seed for reproducible output")
     parser.add_argument("--tempo", type=int, default=None,
@@ -76,10 +79,17 @@ def main(argv=None) -> int:
     print(f"wrote {out_path}: mood={preset.name}, {preset.tempo_bpm} BPM, "
           f"~{args.minutes:g} min, {len(events)} melody notes")
 
-    if args.wav:
+    wav_path = args.wav
+    if args.video and not wav_path:
+        wav_path = os.path.splitext(args.video)[0] + ".wav"
+    if wav_path:
         from . import audio
-        audio.synthesize(events, preset, args.wav, seed=args.seed)
-        print(f"wrote {args.wav}: playable WAV ({preset.name})")
+        audio.synthesize(events, preset, wav_path, seed=args.seed)
+        print(f"wrote {wav_path}: playable WAV ({preset.name})")
+    if args.video:
+        from . import video
+        video.render_video(wav_path, preset, args.video)
+        print(f"wrote {args.video}: uploadable MP4 ({preset.name})")
     return 0
 
 
