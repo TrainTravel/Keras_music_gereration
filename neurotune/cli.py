@@ -41,6 +41,18 @@ def build_parser() -> argparse.ArgumentParser:
                         help="directory of MIDI files to learn melodic style from")
     parser.add_argument("--list-moods", action="store_true",
                         help="describe available mood presets and exit")
+
+    batch = parser.add_argument_group("batch mode (render a moods x seeds matrix)")
+    batch.add_argument("--batch", action="store_true",
+                       help="render many tracks at once into --outdir")
+    batch.add_argument("--moods", default=None,
+                       help="comma list of moods (default: all presets)")
+    batch.add_argument("--seeds", default=None,
+                       help="seed spec, e.g. '1-5' or '1,4,9' (required with --batch)")
+    batch.add_argument("--outdir", default="uploads",
+                       help="batch output directory (default: uploads)")
+    batch.add_argument("--formats", default=None,
+                       help="comma subset of midi,wav,mp4 (default: midi,wav)")
     return parser
 
 
@@ -50,6 +62,22 @@ def main(argv=None) -> int:
     if args.list_moods:
         for preset in PRESETS.values():
             print(f"{preset.name:14s} {preset.tempo_bpm:3d} BPM  {preset.description}")
+        return 0
+
+    if args.batch:
+        from . import batch
+        if not args.seeds:
+            print("error: --batch requires --seeds (e.g. --seeds 1-5)", file=sys.stderr)
+            return 2
+        corpus = sorted(glob.glob(os.path.join(args.corpus, "*.mid")))
+        batch.run_batch(
+            moods=batch.parse_moods(args.moods),
+            seeds=batch.parse_seeds(args.seeds),
+            minutes=args.minutes,
+            outdir=args.outdir,
+            formats=batch.parse_formats(args.formats),
+            corpus_paths=corpus,
+        )
         return 0
 
     preset = PRESETS[args.mood]
