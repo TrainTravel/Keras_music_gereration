@@ -66,6 +66,11 @@ Sources: [Flexclip](https://www.flexclip.com/learn/study-with-me-video.html),
 
 ## 3. Script templates (fill in the brackets)
 
+> **Full shootable episode scripts now live in [`docs/scripts/`](scripts/)** —
+> word-for-word lines, timing, cues, alt takes, and the exact NeuroTune command
+> for each episode's audio bed. The templates below are the quick-reference
+> skeletons.
+
 Scripts here are *light* — body-doubling is presence, not performance. The point
 is a predictable shape, not a monologue. Timestamps assume a 25-min block.
 
